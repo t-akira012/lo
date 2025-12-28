@@ -77,15 +77,15 @@ func renderTable(rows [][]string) string {
 	return t.Render()
 }
 
-func renderSimple(rows [][]string) string {
+func renderNull(rows [][]string) string {
 	var sb strings.Builder
 	for _, row := range rows {
-		fmt.Fprintf(&sb, "\"%s\"\t%s\n", row[0], row[1])
+		fmt.Fprintf(&sb, "%s\t%s\x00", row[0], row[1])
 	}
 	return sb.String()
 }
 
-func run(dir string, simple bool) error {
+func run(dir string, null bool) error {
 	rows, err := collectFiles(dir)
 	if err != nil {
 		return err
@@ -96,8 +96,8 @@ func run(dir string, simple bool) error {
 		return nil
 	}
 
-	if simple {
-		fmt.Print(renderSimple(rows))
+	if null {
+		fmt.Print(renderNull(rows))
 	} else {
 		fmt.Println(renderTable(rows))
 	}
@@ -105,8 +105,8 @@ func run(dir string, simple bool) error {
 }
 
 func main() {
-	simple := flag.Bool("s", false, "simple output for awk/fzf")
-	simpleLong := flag.Bool("simple", false, "simple output for awk/fzf")
+	null := flag.Bool("0", false, "null-separated output for pipelines")
+	nullLong := flag.Bool("null", false, "null-separated output for pipelines")
 	flag.Parse()
 
 	dir := "."
@@ -114,7 +114,7 @@ func main() {
 		dir = flag.Arg(0)
 	}
 
-	if err := run(dir, *simple || *simpleLong); err != nil {
+	if err := run(dir, *null || *nullLong); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}

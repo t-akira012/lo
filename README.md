@@ -13,8 +13,8 @@ go install github.com/t-akira012/lo@latest
 ```bash
 lo              # テーブル表示
 lo /path        # 指定ディレクトリ
-lo -s           # シンプル出力（awk/fzf向け）
-lo --simple     # 同上
+lo -0           # NUL区切り（パイプライン向け）
+lo --null       # 同上
 ```
 
 ## Output
@@ -30,15 +30,14 @@ lo --simple     # 同上
 └──────────────┴────────────────┘
 ```
 
-### シンプル（-s）
+### NUL区切り（-0）
 
 ```
-"README.md"	# Project Title
-"notes.txt"	Meeting notes
+README.md\t# Project Title\0notes.txt\tMeeting notes\0
 ```
 
-### パイプライン例
+## Pipeline
 
 ```bash
-lo -s | fzf | awk -F'\t' '{print $1}' | xargs vim
+vim $(lo -0 | fzf --read0 -d'\t' --with-nth=2 | awk -F'\t' '{print $1}')
 ```

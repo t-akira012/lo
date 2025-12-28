@@ -174,26 +174,26 @@ func TestRenderTable(t *testing.T) {
 	}
 }
 
-func TestRenderSimple(t *testing.T) {
+func TestRenderNull(t *testing.T) {
 	rows := [][]string{
 		{"test.md", "# Test"},
 		{"日本語.txt", "日本語コンテンツ"},
 	}
 
-	output := renderSimple(rows)
+	output := renderNull(rows)
 
-	expected := "\"test.md\"\t# Test\n\"日本語.txt\"\t日本語コンテンツ\n"
+	expected := "test.md\t# Test\x00日本語.txt\t日本語コンテンツ\x00"
 	if output != expected {
-		t.Errorf("renderSimple() = %q, want %q", output, expected)
+		t.Errorf("renderNull() = %q, want %q", output, expected)
 	}
 }
 
-func TestRenderSimpleEmpty(t *testing.T) {
+func TestRenderNullEmpty(t *testing.T) {
 	rows := [][]string{}
-	output := renderSimple(rows)
+	output := renderNull(rows)
 
 	if output != "" {
-		t.Errorf("renderSimple([]) = %q, want empty", output)
+		t.Errorf("renderNull([]) = %q, want empty", output)
 	}
 }
 

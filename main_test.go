@@ -174,6 +174,29 @@ func TestRenderTable(t *testing.T) {
 	}
 }
 
+func TestRenderSimple(t *testing.T) {
+	rows := [][]string{
+		{"test.md", "# Test"},
+		{"日本語.txt", "日本語コンテンツ"},
+	}
+
+	output := renderSimple(rows)
+
+	expected := "\"test.md\"\t# Test\n\"日本語.txt\"\t日本語コンテンツ\n"
+	if output != expected {
+		t.Errorf("renderSimple() = %q, want %q", output, expected)
+	}
+}
+
+func TestRenderSimpleEmpty(t *testing.T) {
+	rows := [][]string{}
+	output := renderSimple(rows)
+
+	if output != "" {
+		t.Errorf("renderSimple([]) = %q, want empty", output)
+	}
+}
+
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsHelper(s, substr))
 }

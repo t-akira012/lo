@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -76,7 +77,15 @@ func renderTable(rows [][]string) string {
 	return t.Render()
 }
 
-func run(dir string) error {
+func renderSimple(rows [][]string) string {
+	var sb strings.Builder
+	for _, row := range rows {
+		fmt.Fprintf(&sb, "\"%s\"\t%s\n", row[0], row[1])
+	}
+	return sb.String()
+}
+
+func run(dir string, simple bool) error {
 	rows, err := collectFiles(dir)
 	if err != nil {
 		return err
@@ -87,17 +96,25 @@ func run(dir string) error {
 		return nil
 	}
 
-	fmt.Println(renderTable(rows))
+	if simple {
+		fmt.Print(renderSimple(rows))
+	} else {
+		fmt.Println(renderTable(rows))
+	}
 	return nil
 }
 
 func main() {
+	simple := flag.Bool("s", false, "simple output for awk/fzf")
+	simpleLong := flag.Bool("simple", false, "simple output for awk/fzf")
+	flag.Parse()
+
 	dir := "."
-	if len(os.Args) > 1 {
-		dir = os.Args[1]
+	if flag.NArg() > 0 {
+		dir = flag.Arg(0)
 	}
 
-	if err := run(dir); err != nil {
+	if err := run(dir, *simple || *simpleLong); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
